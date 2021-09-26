@@ -1,6 +1,7 @@
 import numpy as np
 from pandas.io.parsers import read_csv
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def function_J(m, X, Y, theta0, theta1):
     """
@@ -70,13 +71,12 @@ def gradient():
     theta1 = 0.0
     alpha = 0.01
     # Current value of the function J(theta)
-    curr_J = 0
+    curr_J = function_J(m, X, Y, theta0, theta1)
+    min_J = curr_J
+    min_t0 = 0.0
+    min_t1 = 0.0
 
     i = 0
-    # Calculate the new cost of J function
-    curr_J = function_J(m, X, Y, theta0, theta1)
-    print("Para theta0 = {} // theta1 = {}: J = {}".format(theta0, theta1, curr_J))
-
     for i in range(1500):
         # Calculate the new values to theta_0 and theta_1
         temp0  = new_theta_0(m, X, Y, theta0, theta1, alpha)
@@ -86,7 +86,42 @@ def gradient():
 
         # Calculate the new cost of J function
         curr_J = function_J(m, X, Y, theta0, theta1)
-        print("Para theta0 = {} // theta1 = {}: J = {}".format(theta0, theta1, curr_J))
+        if curr_J < min_J:
+            min_J = curr_J
+            min_t0 = theta0
+            min_t1 = theta1
+
+        #print("Para theta0 = {} // theta1 = {}: J = {}".format(theta0, theta1, curr_J))
+
+    # Graph drawing
+    makeData = make_data(m, [-10, 10], [-1, 4], X, Y)
+    #print(makeData)
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    np.logspace(-2, 3, 20)
+    ax.plot_surface(makeData[0], makeData[1], makeData[2], cmap='jet')
+    plt.show()
+
+    #plt.plot(X, Y, "x", c='red')
+    #C = min_t0 + min_t1 * X
+    #plt.plot(X, C, color="blue", linewidth=1.0, linestyle="solid")
+    #plt.show()
+
+def make_data(m, t0_range, t1_range, X, Y):
+    """
+    Calculate the matrix of Theta0 and Theta1. 
+    """
+
+    step = 0.1
+    Theta0 = np.arange(t0_range[0], t0_range[1], step)
+    Theta1 = np.arange(t1_range[0], t1_range[1], step)
+    Theta0, Theta1 = np.meshgrid(Theta0, Theta1)
+    Coste = np.empty_like(Theta0)
+    for ix, iy in np.ndindex(Theta0.shape):
+        Coste[ix][iy] = function_J(m, X, Y, Theta0[ix][iy], Theta1[ix][iy])
+
+    return [Theta0, Theta1, Coste]
 
 # main
 gradient()
