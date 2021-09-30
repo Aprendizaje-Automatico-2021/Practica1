@@ -11,7 +11,7 @@ def function_J(m, X, Y, theta0, theta1):
     for i in range(m):
         sum = sum + (hipotesis(X[i], theta0, theta1) - Y[i]) ** 2
 
-    result = (1 / 2 * m) * sum
+    result = (1 / (2 * m)) * sum
     return  result.astype(float)
 
 def hipotesis(x, theta0, theta1):
@@ -98,9 +98,11 @@ def gradient():
     #print(makeData)
 
     fig = plt.figure()
-    ax = Axes3D(fig)
-    np.logspace(-2, 3, 20)
-    ax.plot_surface(makeData[0], makeData[1], makeData[2], cmap='jet')
+    #ax = Axes3D(fig)
+    # np.logspace(-2, 3, 20)
+    #ax.plot_surface(makeData[0], makeData[1], makeData[2], cmap='jet')
+    plt.contour(makeData[0], makeData[1], makeData[2],np.logspace(-2, 3, 20), colors='blue')
+    plt.plot(min_t0, min_t1, "x")
     plt.show()
 
     #plt.plot(X, Y, "x", c='red')
