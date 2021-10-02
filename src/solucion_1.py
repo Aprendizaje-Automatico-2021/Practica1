@@ -27,7 +27,7 @@ def diff(x, y, theta0, theta1):
     """
     result = hipotesis(x, theta0, theta1) - y
     return result.astype(float)
-
+    
 def new_theta_0(m, X, Y, theta0, theta1, alpha):
     """
     Calculate the new value of theta0
@@ -57,6 +57,21 @@ def read_data():
     valores = read_csv("./ex1data1.csv", header=None).to_numpy()
     return valores.astype(float)
 
+
+def make_data(m, t0_range, t1_range, X, Y):
+    """
+    Calculate the matrix of Theta0 and Theta1. 
+    """
+    step = 0.1
+    Theta0 = np.arange(t0_range[0], t0_range[1], step)
+    Theta1 = np.arange(t1_range[0], t1_range[1], step)
+    Theta0, Theta1 = np.meshgrid(Theta0, Theta1)
+    Coste = np.empty_like(Theta0)
+    for ix, iy in np.ndindex(Theta0.shape):
+        Coste[ix][iy] = function_J(m, X, Y, Theta0[ix][iy], Theta1[ix][iy])
+
+    return [Theta0, Theta1, Coste]
+
 def gradient():
     """
     Main function to calculate the descent of the gradient
@@ -67,29 +82,25 @@ def gradient():
     Y = valores[:, 1]
     m  = len(X)
     
-    theta0 = 0.0
-    theta1 = 0.0
+    theta0, theta1 = 0.0, 0.0
     alpha = 0.01
+
     # Current value of the function J(theta)
     curr_J = function_J(m, X, Y, theta0, theta1)
     min_J = curr_J
-    min_t0 = 0.0
-    min_t1 = 0.0
+    min_t0, min_t1 = 0.0, 0.0
 
-    i = 0
     for i in range(1500):
         # Calculate the new values to theta_0 and theta_1
         temp0  = new_theta_0(m, X, Y, theta0, theta1, alpha)
         temp1  = new_theta_1(m, X, Y, theta0, theta1, alpha)
-        theta0 = temp0
-        theta1 = temp1
+        theta0, theta1 = temp0, temp1
 
         # Calculate the new cost of J function
         curr_J = function_J(m, X, Y, theta0, theta1)
         if curr_J < min_J:
             min_J = curr_J
-            min_t0 = theta0
-            min_t1 = theta1
+            min_t0, min_t1 = theta0, theta1
 
         #print("Para theta0 = {} // theta1 = {}: J = {}".format(theta0, theta1, curr_J))
 
@@ -98,32 +109,21 @@ def gradient():
     #print(makeData)
 
     fig = plt.figure()
-    #ax = Axes3D(fig)
-    # np.logspace(-2, 3, 20)
-    #ax.plot_surface(makeData[0], makeData[1], makeData[2], cmap='jet')
-    plt.contour(makeData[0], makeData[1], makeData[2],np.logspace(-2, 3, 20), colors='blue')
-    plt.plot(min_t0, min_t1, "x")
-    plt.show()
-
+    
+    # Lineal Function Graph
     #plt.plot(X, Y, "x", c='red')
     #C = min_t0 + min_t1 * X
     #plt.plot(X, C, color="blue", linewidth=1.0, linestyle="solid")
-    #plt.show()
-
-def make_data(m, t0_range, t1_range, X, Y):
-    """
-    Calculate the matrix of Theta0 and Theta1. 
-    """
-
-    step = 0.1
-    Theta0 = np.arange(t0_range[0], t0_range[1], step)
-    Theta1 = np.arange(t1_range[0], t1_range[1], step)
-    Theta0, Theta1 = np.meshgrid(Theta0, Theta1)
-    Coste = np.empty_like(Theta0)
-    for ix, iy in np.ndindex(Theta0.shape):
-        Coste[ix][iy] = function_J(m, X, Y, Theta0[ix][iy], Theta1[ix][iy])
-
-    return [Theta0, Theta1, Coste]
+    
+    # 3D graph
+    #ax = Axes3D(fig)
+    #ax.plot_surface(makeData[0], makeData[1], makeData[2], cmap='jet')
+    
+    # Contour Graph
+    plt.contour(makeData[0], makeData[1], makeData[2], np.logspace(-2, 3, 20), cmap='jet')
+    plt.plot(min_t0, min_t1, "x")
+    
+    plt.show()
 
 # main
 gradient()
