@@ -7,7 +7,7 @@ def read_data():
     """
     Reads the data of the file and return the result as a float
     """
-    valores = read_csv("./ex1data2.csv", header=None).to_numpy()
+    valores = read_csv("./src/ex1data2.csv", header=None).to_numpy()
     return valores.astype(float)
 
 def function_J(m, X, Y, Theta):
