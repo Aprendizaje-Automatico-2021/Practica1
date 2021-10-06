@@ -27,7 +27,7 @@ def new_Theta(m, n, alpha, Theta, X, Y):
     NewTheta = Theta
 
     # Contains the hypotesis function of every row
-    H = np.dot(X, NewTheta)
+    H = np.matmul(X, NewTheta)
     
     # diff
     Diff = H - Y
@@ -75,7 +75,7 @@ def gradient():
 
     # Theta need to have the same values as the columns of X
     Theta = np.zeros(n)
-    alpha = 0.003
+    alpha = 0.0001
 
     # No. expermients
     exp = 1500
@@ -91,11 +91,68 @@ def gradient():
         J = function_J(m, X, Y, Theta)
         axisY[i] = J.sum()
 
-    fig = plt.figure()
-    plt.xlabel('Number Iterations', c = 'green', size='15')
-    plt.ylabel(r'MIN J($\theta$)', c = 'red', size = '15')
-    plt.plot(axisX, axisY, "-", c='blue', label = r'J($\theta$)')
-    plt.legend(loc='upper right')
-    plt.show()
+    #fig = plt.figure()
+    #plt.title(r'$\alpha$: ' + str(alpha))
+    #plt.xlabel('Number Iterations', c = 'green', size='15')
+    #plt.ylabel(r'MIN J($\theta$)', c = 'red', size = '15')
+    #plt.plot(axisX, axisY, "-", c='blue', label = r'J($\theta$)')
+    #plt.legend(loc='upper right')
+    #plt.show()
+    return Theta
 
-gradient()
+def new_normal_Theta(X, Y):
+    #Theta = (X(trans) * X)^-1 * X(trans) * Y
+    X_t = np.transpose(X)
+    Prod = np.dot(X_t, X)
+    Inv = np.linalg.pinv(Prod)
+    b = np.dot(Inv, X_t)
+    newTheta = np.matmul(b, Y)
+
+    return newTheta
+
+def normal_equation():
+    valores = read_data()
+    # Add all the rows and the col(len - 1)
+    X = valores[:, :-1]
+    # The -1 value add the col(len - 1)
+    Y = valores[:, -1]
+    # Row X
+    m = np.shape(X)[0]
+    # Cols X
+    # Add a column of 1's to X
+    X = np.hstack([np.ones([m, 1]), X])
+    n = np.shape(X)[1]   
+
+    for i in range(n):
+        aux = X[:, i]
+        #print("X before: {}".format(aux))
+        X[:, i] = normalize_X(aux)
+        #print("X after: {}".format(aux))
+
+    Theta = np.zeros(n)
+
+    # No. expermients
+    exp = 1500
+    # The X values for the graph
+    axisX = np.arange(0, exp)
+    # The Y values for the graph
+    axisY = np.zeros(exp)
+
+    Theta = new_normal_Theta(X, Y)
+
+    return Theta
+
+def hypotesis(Theta, X):
+    H = np.matmul(X, Theta)
+
+    return H.sum()
+
+Theta = gradient()
+NormalTheta = normal_equation()
+X = [1, 1650, 3]
+print("Hipotesis: ", hypotesis(Theta, X))
+print("Normal hipotesis: ", hypotesis(NormalTheta, X))
+print("Theta: ", Theta)
+print("Theta shape: ", np.shape(Theta))
+print("Normal Theta: ", NormalTheta)
+print("Normal Theta shape: ", np.shape(NormalTheta))

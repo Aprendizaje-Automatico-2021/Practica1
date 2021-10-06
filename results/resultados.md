@@ -159,7 +159,7 @@ gradient()
 # Parte 2 - Regresión lineal con múltiples variables X vectorizado y con ecuaión normal 
 Cálculo del descenso de gradiente mediante regresión lineal con **múltiples variables X** para determinar un valor **Y**, mediante el calculo progresivo de nuevos valores para diferentes **Theta_i** y **alpha constante** aprendiendo a través de datos recogidos en **ex1data2.csv**. Donde los datos de las columnnas representan respectivamente el tamaño de un piso en pies cuadrados, número de habtiaciones y el precio.
 
-## - Cálculo vectorizado - 
+## - Cálculo vectorizado - Ecuación normal -
 ### Sección de código
 ```py
 import numpy as np
@@ -191,7 +191,7 @@ def new_Theta(m, n, alpha, Theta, X, Y):
     NewTheta = Theta
 
     # Contains the hypotesis function of every row
-    H = np.dot(X, NewTheta)
+    H = np.matmul(X, NewTheta)
     
     # diff
     Diff = H - Y
@@ -239,7 +239,7 @@ def gradient():
 
     # Theta need to have the same values as the columns of X
     Theta = np.zeros(n)
-    alpha = 0.003
+    alpha = 0.0001
 
     # No. expermients
     exp = 1500
@@ -255,17 +255,95 @@ def gradient():
         J = function_J(m, X, Y, Theta)
         axisY[i] = J.sum()
 
-    fig = plt.figure()
-    plt.xlabel('Number Iterations', c = 'green', size='15')
-    plt.ylabel(r'MIN J($\theta$)', c = 'red', size = '15')
-    plt.plot(axisX, axisY, "-", c='blue', label = r'J($\theta$)')
-    plt.legend(loc='upper right')
-    plt.show()
+    #fig = plt.figure()
+    #plt.title(r'$\alpha$: ' + str(alpha))
+    #plt.xlabel('Number Iterations', c = 'green', size='15')
+    #plt.ylabel(r'MIN J($\theta$)', c = 'red', size = '15')
+    #plt.plot(axisX, axisY, "-", c='blue', label = r'J($\theta$)')
+    #plt.legend(loc='upper right')
+    #plt.show()
+    return Theta
 
-gradient()
+def new_normal_Theta(X, Y):
+    #Theta = (X(trans) * X)^-1 * X(trans) * Y
+    X_t = np.transpose(X)
+    Prod = np.dot(X_t, X)
+    Inv = np.linalg.pinv(Prod)
+    b = np.dot(Inv, X_t)
+    newTheta = np.matmul(b, Y)
+
+    return newTheta
+
+def normal_equation():
+    valores = read_data()
+    # Add all the rows and the col(len - 1)
+    X = valores[:, :-1]
+    # The -1 value add the col(len - 1)
+    Y = valores[:, -1]
+    # Row X
+    m = np.shape(X)[0]
+    # Cols X
+    # Add a column of 1's to X
+    X = np.hstack([np.ones([m, 1]), X])
+    n = np.shape(X)[1]   
+
+    for i in range(n):
+        aux = X[:, i]
+        #print("X before: {}".format(aux))
+        X[:, i] = normalize_X(aux)
+        #print("X after: {}".format(aux))
+
+    Theta = np.zeros(n)
+
+    # No. expermients
+    exp = 1500
+    # The X values for the graph
+    axisX = np.arange(0, exp)
+    # The Y values for the graph
+    axisY = np.zeros(exp)
+
+    Theta = new_normal_Theta(X, Y)
+
+    return Theta
+
+def hypotesis(Theta, X):
+    H = np.matmul(X, Theta)
+
+    return H.sum()
+
+Theta = gradient()
+NormalTheta = normal_equation()
+X = [1, 1650, 3]
+print("Hipotesis: ", hypotesis(Theta, X))
+print("Normal hipotesis: ", hypotesis(NormalTheta, X))
+print("Theta: ", Theta)
+print("Theta shape: ", np.shape(Theta))
+print("Normal Theta: ", NormalTheta)
+print("Normal Theta shape: ", np.shape(NormalTheta))
 ```
 
 # Gráficas - Parte 2
 ## - Cálculo vectorizado - 
-##### Progresión del coste de J en cada nuevo experimento realizado
-<img src = "https://user-images.githubusercontent.com/47497948/135762937-47c044de-98ca-4ad4-8df9-a8b3a2139247.png" width = "500">
+<div align="center">
+Progresión del coste de J en cada nuevo experimento realizado
+</div>
+
+<p align="center">
+<img src = "https://user-images.githubusercontent.com/47497948/135762937-47c044de-98ca-4ad4-8df9-a8b3a2139247.png" width = "350">
+</p>
+
+<div align="center">
+Cálculos del coste de J con diferentes valores de alpha
+</div>
+
+<p align="center">
+<img src = "https://user-images.githubusercontent.com/47497948/136258187-47df4672-fa51-4f2e-9d2a-9a96bc8bfc55.png" width = "500">
+</p>
+
+<div align="center">
+Salida de consola para comprobar los datos de la ecuación normal y el cálculo vectorizado
+</div>
+
+<p align="center">
+<img src = "https://user-images.githubusercontent.com/47497948/136255289-26cc8d09-cb8c-48b0-803b-91b73b56d925.png" width = "500">
+</p>
