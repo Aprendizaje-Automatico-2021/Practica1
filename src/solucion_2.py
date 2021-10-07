@@ -3,6 +3,8 @@ from numpy.lib import diff
 from pandas.io.parsers import read_csv
 import matplotlib.pyplot as plt
 
+avg = 0
+
 def read_data():
     """
     Reads the data of the file and return the result as a float
@@ -75,7 +77,7 @@ def gradient():
 
     # Theta need to have the same values as the columns of X
     Theta = np.zeros(n)
-    alpha = 0.0001
+    alpha = 0.03
 
     # No. expermients
     exp = 1500
@@ -123,20 +125,7 @@ def normal_equation():
     X = np.hstack([np.ones([m, 1]), X])
     n = np.shape(X)[1]   
 
-    for i in range(n):
-        aux = X[:, i]
-        #print("X before: {}".format(aux))
-        X[:, i] = normalize_X(aux)
-        #print("X after: {}".format(aux))
-
     Theta = np.zeros(n)
-
-    # No. expermients
-    exp = 1500
-    # The X values for the graph
-    axisX = np.arange(0, exp)
-    # The Y values for the graph
-    axisY = np.zeros(exp)
 
     Theta = new_normal_Theta(X, Y)
 
@@ -147,10 +136,30 @@ def hypotesis(Theta, X):
 
     return H.sum()
 
+def calculate_normal_hypotesis(X, Theta):
+    valores = read_data()
+    # Add all the rows and the col(len - 1)
+    X = valores[:, :-1]
+    # Row X
+    m = np.shape(X)[0]
+    # Cols X
+    # Add a column of 1's to X
+    X = np.hstack([np.ones([m, 1]), X])
+    n = np.shape(X)[1] 
+    X = np.vstack([X, [1, 1650, 3]])
+
+    for i in range(n):
+        aux = X[:, i]
+        X[:, i] = normalize_X(aux)
+
+    h = hypotesis(Theta, X[m])
+    return h
+
 Theta = gradient()
 NormalTheta = normal_equation()
 X = [1, 1650, 3]
-print("Hipotesis: ", hypotesis(Theta, X))
+
+print("Hipotesis: ", calculate_normal_hypotesis(X, Theta))
 print("Normal hipotesis: ", hypotesis(NormalTheta, X))
 print("Theta: ", Theta)
 print("Theta shape: ", np.shape(Theta))
